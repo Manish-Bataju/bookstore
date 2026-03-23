@@ -1,0 +1,421 @@
+@import url('https://fonts.googleapis.com/css2?family=Figtree:ital,wght@0,300..900;1,300..900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Kaushan+Script&display=swap');
+
+@import "tailwindcss";
+@import "tw-animate-css";
+@import "shadcn/tailwind.css";
+
+@layer base {
+  * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box; /* Essential for padding to work with fixed widths */
+  }
+}
+
+/* 1. Map your font */
+@theme {
+  --font-sans: "Figtree", ui-sans-serif, system-ui, sans-serif;
+  --font-serif: "Ibarra Real Nova", serif;
+  --font-script: "Kaushan Script", script;
+
+  /* 1. Define the animation name and duration */
+  --animate-marquee: marquee 15s linear infinite;
+
+  /* 2. Define the keyframes (Standard CSS) */
+  @keyframes marquee {
+    from { transform: translateX(0); }
+    to { transform: translateX(calc(-50% - 30px)); } 
+  }
+}
+
+@layer base {
+  :root {
+    /* --- THE CORE PALETTE (Editorial Bookstore) --- */
+
+    /* 1. THE PAPER (Main Background) */
+    --background: 44 20% 89%;      /* #E8E4DB | Aged Paper */
+    --foreground: 351 57% 16%;     /* #3F1114 | Antique Volume (Main Text) */
+
+    /* 2. THE LEATHER (Primary Action) */
+    /* We use a deeper version of your text color for the 'Ink/Leather' feel */
+    --primary: 186 66% 15%;        /* #0D3B40 | Deep Petroleum Teal - Sharp and full of depth */
+    --primary-foreground: 174 40% 95%; /* #E0F2F1 | Very Light Mint/Cream Inset Text */
+
+    /* 3. THE GLOW (Secondary / Hover Bulb) */
+    /* This is your 'Warm Bulb' that radiates light */
+    --secondary: 40 100% 75%;   /* #FFD580 | Golden Filament Glow */
+    --secondary-foreground: 186 66% 15%;  /* #0D3B40 | Deep Petroleum Teal - Sharp and full of depth */
+
+    /* 4. THE EDITORIAL (Destructive / Errors) */
+    --destructive: 354 56% 26%;    /* #681D24 | Editorial Red Ink */
+    --destructive-foreground: 0 0% 100%; /* #FFFFFF | Pure White */
+
+    /* 5. THE SOFT PAPER (Muted / Inputs) */
+    --muted: 33 20% 85%;           /* #D9D2C5 | Soft Shadowed Paper */
+    --muted-foreground: 351 20% 40%; /* #7A5356 | Faded Burgundy Text */
+
+    /* 6. THE DRAWER & CARDS (Popovers) */
+    --popover: 44 20% 92%;         /* #EFECE5 | Fresh Parchment */
+    --popover-foreground: 351 57% 16%; /* #3F1114 | Antique Volume */
+    --card: 44 20% 92%;            /* #EFECE5 | Fresh Parchment */
+    --card-foreground: 351 57% 16%; /* #3F1114 | Antique Volume */
+
+    /* 7. UI ELEMENTS */
+    --border: 33 20% 80%;          /* #CEC6B6 | Dust / Stone Border */
+    --input: 33 20% 80%;           /* #CEC6B6 | Dust / Stone Border */
+    --ring: 40 100% 75% / 0.4;     /* #FFD580 | 40% Transparent Bulb Glow */
+
+    --radius: 0.4rem;              /* Sharper corners for a 'Book' look */
+  }
+
+  /* 1. Global Reset & Interactive States */
+  * {
+    /* Every border now uses your 'Oak/Stone' border color by default */
+    @apply border-border;
+    /* Focus rings are soft Inkwell Blue, not harsh browser defaults */
+    @apply outline-ring/30 focus-visible:outline-2;
+  }
+
+  /* 2. The Body (The "Paper") */
+  body {
+    /* Your Aged Paper background and Antique Volume text */
+    @apply bg-background text-foreground font-sans;
+    /* Makes text look thinner and sharper on high-res tablets */
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    /* Prevents the 'bouncy' scroll on iPads from showing white gaps */
+    overscroll-behavior-y: none;
+    /* Modern smooth scrolling for 'Go to Top' buttons */
+    scroll-behavior: smooth;
+  }
+
+  /* 3. Typography Defaults */
+  h1, h2, h3, h4, h5, h6 {
+    /* Your headers should automatically use the Serif font for that 'Book' feel */
+    @apply font-serif font-bold tracking-tight;
+  }
+}
+
+
+/* 2. Map shadcn Maia variables so Tailwind utilities can "see" them */
+@theme inline {
+  /* 1. Standard Color Mapping (Keep these as is) */
+  /* --- WRAPPED COLOR PALETTE --- */
+  --color-background: hsl(var(--background));
+  --color-foreground: hsl(var(--foreground));
+  
+  --color-card: hsl(var(--card));
+  --color-card-foreground: hsl(var(--card-foreground));
+  
+  --color-popover: hsl(var(--popover));
+  --color-popover-foreground: hsl(var(--popover-foreground));
+  
+  --color-primary: hsl(var(--primary));
+  --color-primary-foreground: hsl(var(--primary-foreground));
+  
+  --color-secondary: hsl(var(--secondary));
+  --color-secondary-foreground: hsl(var(--secondary-foreground));
+  
+  --color-muted: hsl(var(--muted));
+  --color-muted-foreground: hsl(var(--muted-foreground));
+  
+  --color-accent: hsl(var(--accent));
+  --color-accent-foreground: hsl(var(--accent-foreground));
+  
+  --color-destructive: hsl(var(--destructive));
+  --color-destructive-foreground: hsl(var(--destructive-foreground));
+  
+  --color-border: hsl(var(--border));
+  --color-input: hsl(var(--input));
+  --color-ring: hsl(var(--ring));
+
+  /* Radius is a direct unit, so no hsl() needed here */
+  --radius-lg: var(--radius);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-sm: calc(var(--radius) - 4px);
+
+  /* 2. ADAPTIVE RADIUS (The "Maia" Intelligence) */
+  /* We start small for Mobile-B and scale up for Desktop */
+  --radius-lg: var(--radius); 
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-sm: calc(var(--radius) - 4px);
+
+  /* 3. ADAPTIVE SPACING (New for your Bookstore) */
+  /* This creates a "gutter" variable you can use in your Shell */
+  --spacing-gutter: 1rem;
+
+
+ --breakpoint-*: initial;
+
+  /* 1. Smallest Phones (iPhone SE size) */
+  --breakpoint-mb: 375px;
+
+  /* 2. Larger Phones (iPhone Pro Max / Pixel) */
+  --breakpoint-mp: 480px;
+
+  /* 3. Mobile Landscape (Wider phones like Galaxy Ultra) */
+  --breakpoint-mls: 740px;
+
+  /* 4. Tablet Portrait (The iPad/Mi Pad Standard) */
+  --breakpoint-tp: 768px;
+
+  /* 5. Tablet Landscape (The "Wide Tablet" / Mi Pad 5 Landscape) */
+  --breakpoint-tls: 1024px;
+
+  /* 6. Laptops (MacBook Air / Standard Laptops) */
+  --breakpoint-lp: 1280px;
+
+  /* 7. Pro Workstations (Full HD 1080p Monitors) */
+  --breakpoint-dp: 1920px;
+}
+
+@utility shell {
+    /* 1. Center the content */
+    margin-inline: auto;
+
+    /* 2. Default padding for mobile */
+    padding-inline: 1.5rem; 
+
+    /* Default breakpoints for mobile */
+    width: 100%; 
+
+    @media (min-width: 768px) {
+      /* Tablet Portrait */
+      max-width: 720px; 
+      padding-inline: 2rem;
+    }
+
+    @media (min-width: 1024px) {
+      /* Tablet Landscape */
+      max-width: 960px; 
+    }
+
+    @media (min-width: 1280px) {
+      /* Laptop */
+      max-width: 1200px; 
+    }
+
+    @media (min-width: 1920px) {
+      max-width: 1440px; 
+    }
+  }
+
+  @utility scrollbar-library {
+    /* Firefox */
+    scrollbar-width: thin;
+    scrollbar-color: var(--color-muted) transparent;
+
+    /* Chrome, Edge, and Safari (Mi Pad / iOS) */
+    &::-webkit-scrollbar {
+        width: 5px;
+    }
+    &::-webkit-scrollbar-track {
+      background: transparent;
+    }
+    &::-webkit-scrollbar-thumb {
+      background-color: var(--color-muted);
+      border-radius: 20px;
+      /* Only shows the 'Oak' color when you actually scroll */
+      border: 1px solid var(--color-background);
+    }
+  }
+
+  /* --- HEADINGS --- */
+  @utility heading-xl {
+    @apply font-serif text-3xl tp:text-4xl lp:text-5xl font-bold tracking-tight text-foreground leading-[1.15];
+    /* Prevents headings from getting too long on wide screens */
+    max-width: 25ch; 
+  }
+
+  @utility heading-lg {
+    @apply font-serif text-2xl tp:text-3xl font-bold text-foreground leading-tight;
+  }
+
+  @utility heading-md {
+    @apply font-serif text-xl tp:text-2xl font-bold tracking-tight text-primary-foreground leading-none;
+    /* Using 'primary-foreground' (#F2F0E9) for that gold-stamped look on red */
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /*  Use this for Section Titles in the Drawer (e.g., "YOUR ACCOUNT") */
+  @utility heading-sm {
+    @apply font-serif text-lg font-bold text-foreground border-b border-border pb-2 mb-4;
+    /* Gives structure to the Profile Drawer without being 'Loud' */
+  }
+  
+  /*  Use this for Nav Links & Sidebar Categories */
+  @utility nav-item {
+    @apply font-sans text-[15px] tp:text-[16px] font-semibold tracking-wide leading-none;
+    /* Balanced between Body (18px) and Sub-heading (12px) */
+  }
+  /* --- BODY TEXT (Universal Support) --- */
+  @utility body-reading {
+    /* 1. Standard Serif/Sans mix for high readability */
+    @apply font-sans text-base font-normal tp:text-lg text-foreground/80;
+    
+    /* 2. Line height is the "Secret Sauce" for Calm UI */
+    line-height: 1.75;
+    
+    /* 3. The 'ch' unit limits width to ~65 characters per line */
+    /* This is the golden rule of typography for eye-tracking */
+    max-width: 65ch;
+    
+    /* 4. Standard fallback for long words */
+    overflow-wrap: break-word;
+    word-break: break-word;
+  }
+
+  @utility body-sm {
+    @apply font-sans text-sm text-muted-foreground leading-relaxed;
+  }
+
+  /* --- LABELS --- */
+  @utility sub-heading {
+    @apply font-sans text-[10px] tp:text-xs font-black uppercase tracking-[0.2em] text-primary/70;
+  }
+
+  @utility btn-primary {
+    @apply bg-primary text-primary-foreground mt-4 px-4 py-1 
+           rounded-lg font-serif font-bold text-lg 
+           transition-all duration-300 ease-out
+           relative border border-white/10;
+
+    /* THE SHARP BEVEL: High-contrast edges */
+    box-shadow: 
+      /* 1. The 'Highlight' edge (Top & Left) */
+      inset 1.5px 1.5px 0px rgba(255, 255, 255, 0.2), 
+      /* 2. The 'Deep' edge (Bottom & Right) */
+      inset -1.5px -1.5px 0px rgba(0, 0, 0, 0.4),
+      /* 3. The 'Shadow' on the paper */
+      0px 4px 10px rgba(13, 59, 64, 0.2);
+
+    &:hover {
+      /* Turn on the Warm Bulb */
+      @apply bg-secondary text-secondary-foreground -translate-y-1;
+      
+      /* THE GLOW: Sharp gold border + Radiating Light */
+      box-shadow: 
+        0px 0px 20px rgba(255, 213, 128, 0.5),
+        /* Keeps the button edge SHARP even while glowing */
+        inset 0px 0px 0px 2px rgba(255, 255, 255, 0.5);
+    }
+
+    &:active {
+      @apply translate-y-0.5 scale-[0.97];
+      box-shadow: inset 3px 3px 10px rgba(0, 0, 0, 0.3);
+    }
+  }
+
+  @utility btn-editorial {
+    /* 1. Dimensions & Base (Adaptive) */
+    @apply flex items-center justify-center font-serif font-bold rounded-md
+           transition-all duration-500 ease-out relative border border-white/10
+           text-primary-foreground;
+    
+    width: clamp(100px, 12vw, 160px);
+    height: clamp(35px, 5vh, 45px);
+    font-size: clamp(0.875rem, 1vw, 1.125rem);
+
+    /* THE MAGIC: Default to a Neutral Ink if no color is provided */
+    background-color: var(--btn-ink, var(--color-primary));
+
+    /* 2. THE SHARP BEVEL (Shared across all colors) */
+    box-shadow: 
+      inset 1.5px 1.5px 0px rgba(255, 255, 255, 0.2), 
+      inset -1.5px -1.5px 2px rgba(0, 0, 0, 0.4),
+      0px 4px 10px rgba(0, 0, 0, 0.1);
+
+    &:hover {
+      /* 3. THE UNIVERSAL WARM BULB GLOW */
+      /* Every button, regardless of start color, glows to Amber on hover */
+      @apply bg-secondary text-secondary-foreground -translate-y-1;
+      
+      box-shadow: 
+        0px 0px 20px rgba(255, 213, 128, 0.5),
+        inset 0px 0px 0px 1.5px rgba(255, 255, 255, 0.5);
+    }
+
+    &:active {
+      @apply translate-y-0.5 scale-95;
+      box-shadow: inset 3px 3px 10px rgba(0, 0, 0, 0.3);
+    }
+  }
+
+  /* 4. THE COLOR VARIANTS (The "Inks") */
+  .ink-forest { --btn-ink: #053B06; } /* Your Deep Green */
+  .ink-germanBlue { --btn-ink: #009DDC; } /* Your Deep Blue */
+  .ink-editorial { --btn-ink: #681D24; } /* Your Navbar Red */
+
+
+@utility profile-card {
+  /* This is for your Drawer background */
+  @apply bg-card text-card-foreground border-l-4 border-primary/10;
+}
+
+@utility bar-editorial {
+  @apply bg-destructive text-primary-foreground sticky top-0 z-50 
+         flex items-center justify-between px-6 py-2 ;
+  
+  /* A warm red 'bleed' shadow that glows onto the Aged Paper below */
+  box-shadow: 0 4px 20px -5px rgba(104, 29, 36, 0.5);
+}
+
+@utility nav-link-active {
+  /* Instead of black, we use the Warm Bulb Gold (#FFD580) */
+  @apply text-secondary font-bold scale-105 tracking-wide
+         transition-all duration-300 ease-out;
+  
+  /* A subtle golden 'under-glow' like a bookmark */
+  text-shadow: 0 0 12px rgba(255, 213, 128, 0.4);
+}
+
+@utility nav-link-inactive {
+  /* Soft Cream (#F2F0E9) at 80% opacity so it looks like faded ink */
+  @apply text-primary-foreground/80 font-medium tracking-wider 
+         transition-all duration-200 hover:text-primary-foreground hover:scale-105;
+}
+
+@utility bar-bottom-glass {
+  /* 1. The Base: Editorial Red with 80% transparency & Blur */
+  @apply bg-destructive/60 backdrop-blur-xl border-t border-white/10
+         fixed bottom-0 inset-x-0 z-1002 w-full 
+         flex justify-center items-center tp:py-1;
+
+  /* 2. Adaptive Height: Using your clamp logic */
+  height: clamp(60px, 12vw, 80px); /* Slightly increased max for tablet/desktop */
+  
+  /* 3. Safe Area: Prevents 'Home Bar' overlap on mobile */
+  padding-bottom: env(safe-area-inset-bottom);
+
+  /* 4. The Glow: A soft red bleed onto the paper below */
+  box-shadow: 0 -4px 20px rgba(104, 29, 36, 0.3);
+}
+
+@utility label-editorial {
+  /* 1. Typography: Small, Bold, and All-Caps */
+  @apply text-[12px] font-bold uppercase tracking-[0.15em] text-foreground/70;
+  
+  /* 2. Layout: Ensure it sits slightly away from the input */
+  @apply block ml-1 mb-1.5;
+  
+  /* 3. Transition: For when the input is focused */
+  @apply transition-colors duration-300;
+}
+
+/* Optional: Focused state for the label when the input is active */
+.group:focus-within .label-editorial {
+  @apply text-secondary; /* Turns 'Warm Bulb' gold when typing */
+}
+
+@utility input-editorial {
+  @apply w-full bg-white/20 border border-border/40 rounded-sm px-4 py-3
+         font-sans text-[15px] transition-all duration-300
+         placeholder:text-foreground/30 outline-none;
+
+  /* The 'Warm Bulb' Focus: It illuminates when you click in */
+  &:focus {
+    @apply border-secondary-foreground/50 bg-white/70;
+    box-shadow: 0 0 15px rgba(255, 213, 128, 0.15);
+  }
+}
