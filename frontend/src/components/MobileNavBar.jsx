@@ -10,7 +10,7 @@ const categories = [
 ];
 
 const MobileNavBar = () => {
-  const { setIsCartOpen, setIsProfileOpen, isCartOpen, isProfileDrawerOpen } = useShop(); // 2. Get setters and state
+  const { setIsCartOpen, setIsProfileDrawerOpen, isCartOpen, isProfileDrawerOpen } = useShop(); // 2. Get setters and state
 
   return (
     <nav className="bar-bottom-glass"> {/* Increased z-index to stay above drawers */}
@@ -39,9 +39,9 @@ const MobileNavBar = () => {
                         if (label === 'CART') {
                           // If already open, close it. If closed, open it.
                           setIsCartOpen(!isCartOpen);
-                          setIsProfileOpen(false); // Close profile if we're opening cart
+                          setIsProfileDrawerOpen(false); // Close profile if we're opening cart
                         } else {
-                          setIsProfileOpen(!isProfileDrawerOpen);
+                          setIsProfileDrawerOpen(!isProfileDrawerOpen);
                           setIsCartOpen(false); // Close cart if we're opening profile
                         }
                       }}
