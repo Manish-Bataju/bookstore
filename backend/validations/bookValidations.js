@@ -1,63 +1,65 @@
 import Joi from "joi";
 
 export const bookJoiSchema = Joi.object({
-  title: Joi.string().required().trim().messages({
-    "string.empty": "title can not be empty",
-  }),
+  // 1. Strings - Using .allow("") for fields that might start empty
+  title: Joi.string().required().trim(),
+  description: Joi.string().allow("").trim(), 
+  author: Joi.string().allow("").trim(),
+  brand: Joi.string().allow("").trim(),
+  isbnNo: Joi.string().allow("").trim(),
+  edition: Joi.any(), // Since it's '0' or a string, .any() is safest
 
+  // 2. The Category Object
   category: Joi.object({
-    main: Joi.string().hex().length(24).required().messages({
-      "any.required": "Main Cate4gory ID is required",
-      "string.length": "invalid main category ID format",
-    }),
-    subcategory: Joi.string().hex().length(24).required().messages({
-      "any.required": "sub-category is required",
-      "string.length": "invalid sub category length",
-    }),
+    productType: Joi.string().allow("").required(),
+    main: Joi.string().allow("").required(),
+    subcategory: Joi.string().allow("").optional(),
   }).required(),
 
-  //financial
-  costPrice: Joi.number().required().min(0).messages({
-    "number.base": "Cost price must be a number",
-    "number.min": "Cost Price can not be negative",
-  }),
-  margin: Joi.number().min(0).required().messages({
-    "number.base": "Margin must be a number",
-    "number.min": "Margin can not be negative",
-  }),
+  // 3. Numbers - Joi will automatically convert your form strings to numbers
+  margin: Joi.number().default(0),
+  costPrice: Joi.number().min(0).default(0),
+  discountAmount: Joi.number().min(0).default(0),
+  rentalPrice: Joi.number().min(0).default(0),
+  discountType: Joi.string().valid("Percentage", "Flat", "None").default("None"),
 
-  stock: Joi.number().min(1).required().messages({}),
-  edition: Joi.string().trim().required(),
-  isbnNo: Joi.string().trim().allow("", null),
+  // 4. Stock History - This matches your Frontend array exactly
+  stockHistory: Joi.array().items(
+    Joi.object({
+      quantityReceived: Joi.number().default(0),
+      unitCost: Joi.number().default(0)
+    })
+  ).optional(),
 
-  description: Joi.string().required().trim().messages({
-    "string.empty": "Description can not be empty",
-  }),
+  // 5. Dimension Object (Matches your keys: height, width, thickness, weight)
+  bookDimension: Joi.object({
+    height: Joi.any().allow(""),
+    width: Joi.any().allow(""),
+    thickness: Joi.any().allow(""),
+    weight: Joi.any().allow("")
+  }).optional(),
 
-  bookImage: Joi.array()
-    .items(
-      Joi.string()
-        .uri()
-        .pattern(/\.(jpg|jpeg|png|webp|avif)$/i),
-    )
-    .min(1)
-    .required()
-    .messages({
-      "array.min": "At least 1 book image is required",
-      "string.pattern.base": "images must be in JPG, PNG or webp format",
-      "string.uri": "invalid Image url format",
-    }),
-});
+  // 6. Booleans - Handles both real booleans and strings like "false"
+  isForRent: Joi.any().default(false),
+  
+  // 7. Arrays
+  tags: Joi.array().items(Joi.string()).default(['Best Seller']),
+
+  // 8. Images - These are handled by Multer separately
+  bookImage: Joi.any().optional(),
+
+}).unknown(true); // Allow thumbnailPreview and other extra fields
 
 export const updateBookJoiSchema = bookJoiSchema.fork(
   [
     "title",
     "category",
-    "costPrice",
+    "costPrice", // Now optional in the base schema anyway
     "margin",
-    "stock",
+    "stockHistory", // Updated from 'stock' to match your base schema
     "description",
     "bookImage",
+    "edition",
   ],
   (schema) => schema.optional(),
 );

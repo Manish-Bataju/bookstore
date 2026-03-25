@@ -6,6 +6,7 @@ export const InternalShopContext = createContext();
 const ShopProvider =({children})=>{
     // connecting front end with backend
     const backendUrl = import.meta.env.VITE_BACKEND_URL
+    const [activeAdminForm, setActiveAdminForm] = useState();
 
     //1. Drawer States
     const[isProfileDrawerOpen, setIsProfileDrawerOpen] = useState(false);
@@ -130,7 +131,8 @@ const value={
         books,loading,getBooksData,
         myOrders,fetchMyOrders,
         token, setToken,
-        logOut
+        logOut,
+        setActiveAdminForm, activeAdminForm
 }
     return(
     <InternalShopContext.Provider value={value}>

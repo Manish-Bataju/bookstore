@@ -5,7 +5,8 @@ const bookSchema = new mongoose.Schema(
     title: { type: String, required: true, trim: true, minLength: 10 },
     bookSlug: { type: String, unique: true, trim: true },
     description: { type: String, required: true, trim: true, minLength: 40 },
-    author: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
+    author: { type: String, required: true, trim: true },
+    seller: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
 
     category: {
       // This defines if it's a "Genre", "Special", "Featured", or "Stationery"
@@ -19,24 +20,13 @@ const bookSchema = new mongoose.Schema(
       // Optional further detail
       subcategory: { type: String },
     },
-    tags: [
-      {
-        type: String,
-        enum: [
-          "Best Selling",
-          "Awarded",
-          "Best Seller",
-          "New Arrival",
-          "Discounted",
-          "Limited Edition",
-          "Exclusive",
-          "Trending",
-        ],
-        default: ["Best Seller"],
-      },
-    ],
+    // In bookModel.js (Mongoose)
+    tags: {
+      type: [String], // This tells Mongoose to expect an Array of Strings
+      default: ["Best Seller"],
+    },
     brand: { type: String, trim: true },
-    edition: { type: String, required: true },
+    edition: { type: String },
     isbnNo: { type: String, unique: true, sparse: true },
     bookImage: {
       coverImage: { type: String }, // The resized 300x400 URL
@@ -60,7 +50,7 @@ const bookSchema = new mongoose.Schema(
 
     totalStockValue: { type: Number, default: 0 },
     margin: { type: Number, default: 0 },
-    costPrice: { type: Number, required: true, default: 0 },
+    costPrice: { type: Number, default: 0 },
     sellingBasePrice: { type: Number, default: 0 },
     discountType: {
       type: String,
@@ -84,8 +74,12 @@ const bookSchema = new mongoose.Schema(
     rentalPrice: { type: Number, default: 0 },
     rentalStatus: {
       type: String,
-      enum: ["Available for Rent", "Currently Rented"],
-      default: "Available for Rent",
+      enum: [
+        "Available for Rent",
+        "Currently Rented",
+        "Not available for Rent",
+      ], // Add this!
+      default: "Not available for Rent",
     },
 
     averageRating: { type: Number, default: 0 },

@@ -1,12 +1,12 @@
 import ProductGallery from '../Components/ProductGallery.jsx'
-import ProductForm from '@/Forms/ProductForm.jsx'
+import ProductEditForm from '@/Forms/ProductEditForm.jsx'
 
 
 const Rent = () => {
   return (
     <div>{/* We call the gallery and tell it which ageGroup to filter for */}
     {/* <ProductGallery categoryTitle="Rent"/> */}
-    <ProductForm/>
+    <ProductEditForm/>
     </div>
   )
 }

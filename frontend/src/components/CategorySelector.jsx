@@ -5,15 +5,15 @@ import { Category_Enum } from "../../../Shared/enums.js";
 
 const CategorySelector = ({ register, setValue, control }) => {
 
-    const selectedProductType = useWatch({control, name: "category.productType"});
-    const selectedMainLabel = useWatch({control, name:"category.main"});
+    const selectedProductType = useWatch({ control, name: "category.productType" });
+    const selectedMainLabel = useWatch({ control, name: "category.main" });
 
     const mainOptions = selectedProductType ? Category_Map[selectedProductType] : [];
     const activeMainObject = mainOptions.find(item => item.label === selectedMainLabel);
     const subOptions = activeMainObject?.children || [];
 
-    const selectStyle = "w-full py-2 rounded-md bg-white/60 text-gray-700 border border-gray-700 focus:ring-1 focus:ring-[#0a2463] focus:border-transparent outline-none transition-all duration-300";
-    const labelStyle = "body-reading font-medium text-gray-700 uppercase mb-5 ml-1";
+    const selectStyle = "w-full py-2 rounded-md bg-white/60 text-black border border-gray-700 focus:ring-1 focus:ring-[#0a2463] focus:border-transparent outline-none transition-all duration-300";
+    const labelStyle = "label-editorial";
 
     return (
         <div className="flex flex-col justify-items-center gap-3">
@@ -30,9 +30,9 @@ const CategorySelector = ({ register, setValue, control }) => {
                     }}
                 >
                     <option value="">--Type--</option>
-                        {Category_Enum.map(type => (
-                            <option key={type} value={type}>{type}</option>
-                        ))}
+                    {Category_Enum.map(type => (
+                        <option key={type} value={type}>{type}</option>
+                    ))}
                 </select>
             </div>
 
@@ -48,12 +48,10 @@ const CategorySelector = ({ register, setValue, control }) => {
                             setValue("category.subcategory", "")
                         }}
                     >
-                        <optgroup label="">
                             <option value="">---Select--</option>
                             {mainOptions.map(item => (
-                                <option key={item.label} value={item.label}>{item.label}</option>
+                                <option key={item._id} value={item._id}>{item.label}</option>
                             ))}
-                        </optgroup>
                     </select>
                 </div>
 
@@ -65,12 +63,10 @@ const CategorySelector = ({ register, setValue, control }) => {
                     <select
                         {...register("category.subcategory")}
                         className={selectStyle}>
-                        <optgroup label="">
                             <option value="">--Sub-Category</option>
                             {subOptions.map(sub => (
-                                <option key={sub} value={sub}>{sub}</option>
+                                <option key={sub._id} value={sub._id}>{sub}</option>
                             ))}
-                        </optgroup>
                     </select>
                 </div>
             )}

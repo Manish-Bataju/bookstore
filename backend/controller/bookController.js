@@ -2,38 +2,40 @@ import Book from "../schema/bookModel.js";
 
 //only admin access to add book
 const addBook = async (req, res) => {
-  try {
-    const {
-      title,
-      author,
-      description,
-      price,
-      discountPercentage,
-      category,
-      stock,
-    } = req.body;
 
-    // Safety Check: Did they actually upload images?
-    if (!req.files || req.files.length === 0) {
-      return res.status(400).json({ 
-        success: false, 
-        message: "Please upload at least one book image." });
+  console.log("User Found:", req.user)
+
+  try {
+    // --- AUTOMATIC PARSING BLOCK ---
+    for (const key in req.body) {
+      try {
+        if (typeof req.body[key] === 'string' && (req.body[key].startsWith('{') || req.body[key].startsWith('['))) {
+          req.body[key] = JSON.parse(req.body[key]);
+        }
+      } catch (e) { /* Not JSON, skip */ }
     }
 
-    //mapping the cloudinary image urls
-    const imageUrls = req.files.map(file => file.path)
+    //mapping of Image from multer..
+    const coverUrl = req.files?.["coverImage"]?.[0]?.path;
+    const galleryUrls = req.files?.["gallery"]?.map((file) => file.path) || [];
 
-      //created a new book instance with details
+    //created a new book instance with details
     const book = new Book({
       ...req.body,
-      bookImage: imageUrls,
+      bookImage: {
+        coverImage: coverUrl,
+        gallery: galleryUrls,
+      },
       seller: req.user._id,
     });
 
     const savedBook = await book.save();
     res.status(201).json({ success: true, savedBook });
   } catch (error) {
-    const statusCode = error.name === 'ValidationError' ? 400 : 500;
+    const statusCode = error.name === "ValidationError" ? 400 : 500;
+
+    console.error("🔥 DATABASE CRASH:", error);
+    
     return res.status(statusCode).json({ message: error.message });
   }
 };
@@ -41,8 +43,7 @@ const addBook = async (req, res) => {
 //get all books by public
 const getAllBooks = async (req, res) => {
   try {
-    const books = await Book.find({})
-      .populate("author", "name email")
+    const books = await Book.find({}).populate("author", "name email");
     res.status(200).json({
       success: true,
       count: books.length,
@@ -56,8 +57,10 @@ const getAllBooks = async (req, res) => {
 //search book by ID
 const getBookById = async (req, res) => {
   try {
-    const book = await Book.findById(req.params.id)
-      .populate("author", "fullName email shopName -_id")
+    const book = await Book.findById(req.params.id).populate(
+      "author",
+      "fullName email shopName -_id",
+    );
     if (!book) return res.status(404).json({ message: "Book not found" });
 
     return res.status(200).json({ success: true, data: book });
@@ -73,12 +76,22 @@ const updateBook = async (req, res) => {
 
     if (!book) return res.status(404).json({ message: "Book not found" });
 
-      //image uploads
-      if(req.files && req.files.length > 0){
-        const newImageUrls = req.files.map(file => file.path);
+    // security verification whoever owns the book can edit it :)
+    if (book.author.toString() !== req.user.id) {
+      return res
+        .status(403)
+        .json({ message: "You are not authorized to edit it" });
+    }
 
-        req.body.bookImage = [...book.bookImage, newImageUrls];
-      }
+    //image uploads
+    if (req.files && req.files.length > 0) {
+      const newImageUrls = req.files.map((file) => file.path);
+
+      req.body.bookImage = {
+        coverImage: newImageUrls[0] || book.bookImage.coverImage,
+        gallery: [...(book.bookImage.gallery || []), ...newImageUrls.slice(1)],
+      };
+    }
 
     //update book fields
     Object.assign(book, req.body);
