@@ -1,9 +1,9 @@
-import ProductForm from '@/Forms/ProductForm.jsx'
+import ProductGallery from '@/components/ProductGallery.jsx'
 import React from 'react'
 
 const Stationery = () => {
   return (
-    <ProductForm />
+    <ProductGallery productType="Stationery"/>
   )
 }
 

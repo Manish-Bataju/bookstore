@@ -1,5 +1,5 @@
 import React from 'react'
-import ProductGallery from '../Components/ProductGallery.jsx'
+import ProductGallery from '../components/ProductGallery.jsx'
 
 const Special = () => {
   return (

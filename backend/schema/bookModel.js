@@ -2,11 +2,10 @@ import mongoose from "mongoose";
 
 const bookSchema = new mongoose.Schema(
   {
-    title: { type: String, required: true, trim: true, minLength: 10 },
+    title: { type: String, required: true, trim: true, minLength: 8 },
     bookSlug: { type: String, unique: true, trim: true },
     description: { type: String, required: true, trim: true, minLength: 40 },
     author: { type: String, required: true, trim: true },
-    seller: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
 
     category: {
       // This defines if it's a "Genre", "Special", "Featured", or "Stationery"
@@ -156,7 +155,9 @@ bookSchema.pre("save", function () {
     const cost = this.costPrice || 0;
     const marginPercent = this.margin || 0;
 
-    this.sellingBasePrice = cost + cost * (marginPercent / 100);
+    const rawCost = cost + cost * (marginPercent / 100)
+
+    this.sellingBasePrice = Number(rawCost.tofixed(2)) ;
   }
 
   // --- 4. PRICING & DISCOUNT (Fixing variables & quotes) ---
@@ -170,19 +171,19 @@ bookSchema.pre("save", function () {
 
     switch (this.discountType) {
       case "Percentage":
-        this.finalPrice = base - base * (amount / 100);
+        rawPrice = base - base * (amount / 100);
         break;
 
       case "Flat":
-        this.finalPrice = base - amount;
+        rawPrice = base - amount;
         break;
 
       case "None":
       default:
-        this.finalPrice = base;
+        rawPrice = base;
         break;
     }
-    if (this.finalPrice < 0) this.finalPrice = 0;
+    this.finalPrice = rawPrice < 0 ? 0 : Number(rawPrice.toFixed(2));
   }
 
   //5. ------- Reviews and Rating Calculator -------
