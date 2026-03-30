@@ -2,7 +2,7 @@ import mongoose from "mongoose";
 
 const bookSchema = new mongoose.Schema(
   {
-    title: { type: String, required: true, trim: true, minLength: 8 },
+    title: { type: String, required: true, trim: true, maxLength: 25 },
     bookSlug: { type: String, unique: true, trim: true },
     description: { type: String, required: true, trim: true, minLength: 40 },
     author: { type: String, required: true, trim: true },
@@ -157,7 +157,7 @@ bookSchema.pre("save", function () {
 
     const rawCost = cost + cost * (marginPercent / 100)
 
-    this.sellingBasePrice = Number(rawCost.tofixed(2)) ;
+    this.sellingBasePrice = Number(rawCost.toFixed(2)) ;
   }
 
   // --- 4. PRICING & DISCOUNT (Fixing variables & quotes) ---
@@ -168,6 +168,7 @@ bookSchema.pre("save", function () {
   ) {
     const base = this.sellingBasePrice || 0;
     const amount = this.discountAmount || 0;
+    let rawPrice = 0;
 
     switch (this.discountType) {
       case "Percentage":
@@ -207,13 +208,7 @@ bookSchema.pre("save", function () {
 
   //rental status to define here
   // 1. If the user UNCHECKS "isForRent",'Not Available'
-  if (!this.isForRent) {
-    this.rentalStatus = "Not available for Rent";
-  }
-  // 2. If "isForRent" is TRUE, set it to 'Available'
-  else if (this.isForRent && !this.rentalStatus) {
-    this.rentalStatus = "Available for Rent";
-  }
+  this.rentalStatus = this.isForRent ? "Available for Rent" : "Not Available for Rent";
 });
 
 export default mongoose.model("Book", bookSchema);

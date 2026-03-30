@@ -7,10 +7,12 @@ import ImageUploader from "@/components/ImageUploader.jsx";
 import { Rental_Tags } from "../../../Shared/enums.js";
 import axios from "axios";
 import useShop from "@/hooks/useShop.js";
+import { toast } from "sonner";
+import { X } from "lucide-react";
 
 // 2. MAIN FORM COMPONENT
 const ProductForm = () => {
-  const { register, control, handleSubmit, setValue, formState: { errors } } = useForm({
+  const { register, control, handleSubmit, setValue, reset, formState: { errors } } = useForm({
     mode: "onChange",
     reValidateMode: "onChange",
     defaultValues: {
@@ -50,15 +52,16 @@ const ProductForm = () => {
       }
     }
   });
-  const { setActiveAdminForm, backendUrl } = useShop();
+
+  const { setActiveAdminForm, backendUrl, setBooks } = useShop();
   const currentTags = useWatch({ control, name: "tags" }) || [];
   const isForRent = useWatch({ control, name: "isForRent" })
   // const discountType = useWatch({ control, name: "discount.discountType" });
   const history = useWatch({ control, name: "stockHistory" });
   const firstUnitCost = history?.[0]?.unitCost;
 
-  
-    useEffect(() => {
+
+  useEffect(() => {
     if (isForRent) {
       setValue("rentalStatus", Rental_Tags.Status[0]);
     } else {
@@ -110,8 +113,14 @@ const ProductForm = () => {
       })
 
       if (response.status === 201 || response.status === 200) {
-        alert(`📚 "${data.title}" successfully added!`);
-        setActiveAdminForm(null); // Closes the form
+        const newBook = response.data.savedBook;
+        console.log("Full Server Response:", response.data);
+
+        toast.success(`📚 "${newBook.title}" successfully added!`);
+        setBooks(prevBooks => [newBook, ...prevBooks]);
+
+        //clear the form and allow to add another book
+        reset();
       }
 
     } catch (error) {
@@ -121,7 +130,21 @@ const ProductForm = () => {
 
   return (
     <div className="max-tls:hidden w-[35vw] border-2 rounded-lg px-8 py-5 bg-white shadow-xl">
-      <h1 className="text-2xl font-bold text-center mb-6">Add a Product</h1>
+      <div className="flex justify-between items-center">
+        <h1 className="text-2xl font-bold text-center mb-6">Add a Product</h1>
+
+        <button
+          onClick={() => setActiveAdminForm(null)} // This is your close function!
+          className="top-5 right-5 w-10 h-10 flex items-center justify-center rounded-full text-gray-400 transition-all duration-200 hover:text-white hover:bg-red-500 shadow-sm"
+          type="button"
+        >
+          <X size={20} />
+        </button>
+      </div>
+
+
+
+
       <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-5">
 
         <div className="flex flex-col gap-3" >
@@ -131,7 +154,7 @@ const ProductForm = () => {
               <input
                 {...register('title', {
                   required: "Required",
-                  minLength: { value: 10, message: "Title has to be minimum 10 Characters Long" }
+                  maxLength: { value: 25, message: "Title has to be maximum 25 Characters Long" }
                 })}
                 className="border body-reading pl-2 rounded-md w-full focus:ring-1 focus:ring-[#0a2463]"
                 placeholder="Book Title"

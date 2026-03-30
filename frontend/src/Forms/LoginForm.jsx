@@ -4,11 +4,9 @@ import { Loader2 } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
 
-
-
 const LoginForm = ({onSuccess}) => {
 
-    const { setUser} = useShop();
+    const { login } = useShop();
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState('');
 
@@ -27,11 +25,7 @@ const LoginForm = ({onSuccess}) => {
             console.log("postman confirmed this data:", data);
             if (data._id) {
 
-                // saving user to context
-                setUser(data);
-
-                // save token
-                localStorage.setItem('bookstore_token', data.token);
+               await login(data); // Update context with token and user info
 
                 // trigger the success signal
                 if(onSuccess) onSuccess();

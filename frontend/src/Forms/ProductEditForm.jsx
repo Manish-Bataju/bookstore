@@ -1,19 +1,15 @@
 import { useForm, useWatch } from "react-hook-form";
-import { Category_Config } from "@/data/CategoryConfig.js";
-// import { useEffect } from "react";
-import CategorySelector from "@/Components/CategorySelector.jsx";
-import TagSelector from "@/components/TagSelector.jsx";
+import { X } from "lucide-react";
 import ImageUploader from "@/components/ImageUploader.jsx";
-import { Rental_Tags } from "../../../Shared/enums.js";
 import useShop from "@/hooks/useShop.js";
 import { useEffect } from "react";
 import axios from "axios";
-// import { useParams } from "react-router-dom";
+
 
 // 2. MAIN FORM COMPONENT
 const ProductEditForm = ({ id }) => {
   //getting Id from the url
-  const { books, backendUrl } = useShop();
+  const { books, backendUrl, setActiveAdminForm} = useShop();
 
   const selectedBook = books.find(b => b._id === id);
   console.log(selectedBook);
@@ -75,7 +71,18 @@ const ProductEditForm = ({ id }) => {
 
   return (
     <div className="max-tls:hidden w-[35vw] border-2 rounded-lg px-8 py-5 bg-white shadow-xl">
-      <h1 className="text-2xl font-bold text-center mb-6">Add a Product</h1>
+      <div className="flex justify-between items-center mb-3">
+        <h1 className="text-2xl font-bold">Edit a Product</h1>
+
+        <button
+          onClick={() => setActiveAdminForm(null)} // This is your close function!
+          className="top-5 right-5 w-10 h-10 flex items-center justify-center rounded-full text-gray-400 transition-all duration-200 hover:text-white hover:bg-red-500 shadow-sm"
+          type="button"
+        >
+          <X size={20} />
+        </button>
+      </div>
+      
       <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-2">
 
         <div className="flex flex-col gap-5" >

@@ -1,10 +1,10 @@
-import ProductGallery from '../Components/ProductGallery.jsx'
+import ProductGallery from "@/components/ProductGallery.jsx"
 
 const Rent = () => {
+
   return (
-    <div>{/* We call the gallery and tell it which ageGroup to filter for */}
-    {/* <ProductGallery categoryTitle="Rent"/> */}
-    <ProductGallery productType="Rent"/>
+    <div>
+      <ProductGallery productType="Genres" isRentPage={true} />
     </div>
   )
 }

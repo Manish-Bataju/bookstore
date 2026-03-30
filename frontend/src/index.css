@@ -307,6 +307,38 @@
     }
   }
 
+  @utility btn-cart {
+    @apply bg-red-500 text-white mt-4 px-4 py-1 
+           rounded-lg font-serif font-bold text-lg 
+           transition-all duration-300 ease-out
+           relative border border-white/10;
+
+    /* THE SHARP BEVEL: High-contrast edges */
+    box-shadow: 
+      /* 1. The 'Highlight' edge (Top & Left) */
+      inset 1.5px 1.5px 0px rgba(255, 255, 255, 0.2), 
+      /* 2. The 'Deep' edge (Bottom & Right) */
+      inset -1.5px -1.5px 0px rgba(0, 0, 0, 0.4),
+      /* 3. The 'Shadow' on the paper */
+      0px 4px 10px rgba(13, 59, 64, 0.2);
+
+    &:hover {
+      /* Turn on the Warm Bulb */
+      @apply bg-secondary text-secondary-foreground -translate-y-1;
+      
+      /* THE GLOW: Sharp gold border + Radiating Light */
+      box-shadow: 
+        0px 0px 20px rgba(255, 213, 128, 0.5),
+        /* Keeps the button edge SHARP even while glowing */
+        inset 0px 0px 0px 2px rgba(255, 255, 255, 0.5);
+    }
+
+    &:active {
+      @apply translate-y-0.5 scale-[0.97];
+      box-shadow: inset 3px 3px 10px rgba(0, 0, 0, 0.3);
+    }
+  }
+
   @utility btn-editorial {
     /* 1. Dimensions & Base (Adaptive) */
     @apply flex items-center justify-center font-serif font-bold rounded-md

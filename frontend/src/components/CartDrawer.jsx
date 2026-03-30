@@ -3,11 +3,16 @@
 import { motion, AnimatePresence } from 'framer-motion';
 import useShop from '@/hooks/useShop.js';
 import { X, Plus, Minus, ShoppingBag } from 'lucide-react';
+import { useEffect } from 'react';
 
 const CartDrawer = () => {
-    const { isCartOpen, setIsCartOpen, cartItems, headerHeight } = useShop();
+    const { isCartOpen, setIsCartOpen, cartItems, headerHeight, updateCartItems, removeFromCart} = useShop();
 
-    const total = (cartItems || []).reduce((acc, item) => acc + (item.price * item.quantity), 0);
+    console.log("Current Cart Items:", cartItems);
+
+    useEffect(() => {
+        console.log("CartDrawer detected change:", cartItems);
+    }, [cartItems]);
 
     return (
         <AnimatePresence>
@@ -35,7 +40,7 @@ const CartDrawer = () => {
                         className={`
                             fixed profile-card shadow-xl z-1000 flex flex-col
                             bottom-0 left-0 right-0 w-full rounded-t-4xl h-[85vh]
-                            lp:top-0 lp:right-0 lp:left-auto lp:h-screen lp:w-85 lp:rounded-none
+                            lp:top-0 lp:right-0 lp:left-auto lp:h-screen lp:w-[45vw] dp:w-[30vw] lp:rounded-none
                         `}
                         style={{
                             top: window.innerWidth >= 1024 ? `${headerHeight}px` : 'auto',
@@ -43,10 +48,10 @@ const CartDrawer = () => {
                         }}
                     >
                         {/* Header */}
-                        <div className='p-6 border-b border-gray-100 flex justify-between items-center'>
+                        <div className='border-b border-gray-100 flex justify-between items-center mb-3 pl-4'>
                             <div className='flex items-center gap-2'>
                                 <ShoppingBag size={20} />
-                                <h2 className='text-xl font-bold tracking-tight'>Your bag ({cartItems.length})</h2>
+                                <h2 className='text-xl font-bold tracking-tight'>Your bag ({cartItems.itemCount})</h2>
                             </div>
                             <button onClick={() => setIsCartOpen(false)} className='p-2 hover:bg-gray-100 rounded-full'>
                                 <X size={20} />
@@ -54,26 +59,48 @@ const CartDrawer = () => {
                         </div>
 
                         {/* Scrollable Area */}
-                        <div className='flex grow overflow-y-auto p-6 space-y-6'>
-                            {cartItems.length > 0 ? (
-                                cartItems.map((item) => (
-                                    <motion.div layout key={item.id} className='flex gap-4 items-start'>
-                                        <img src={item.image} alt={item.name} className='w-20 h-24 object-cover rounded-xl bg-gray-200' />
-                                        <div className='flex-1'>
-                                            <h3 className='font-semibold text-navy'>{item.name}</h3>
-                                            <p className='text-sm text-gray-400 mb-2'>{item.size || 'One Size'}</p>
-                                            <div className='flex justify-between items-center'>
-                                                <div className='flex items-center border rounded-lg'>
-                                                    <button className='p-1 hover:text-mauve'><Minus size={14} /></button>
+                        <div className='flex flex-col gap-5 items-center grow overflow-y-auto px-5 space-y-1'>
+                            {cartItems.items?.length > 0 ? (
+                                cartItems.items.map((item) => {
+                                    if (!item) return null;
+
+                                    return (
+                                        <motion.div layout key={item.book._id} className='flex flex-col gap-4 items-start'>
+                                        <div className='grid grid-cols-6 items-center'>
+                                            <div className='flex items-center justify-center'>
+                                               <img src={item.book.bookImage.coverImage} alt={item.book.title} className='w-15 h-auto object-cover rounded-xl bg-gray-200' />
+                                            </div>
+
+                                            <h3 className='font-semibold text-navy text-center'>{item.book.title}</h3>
+                                            <p className='text-sm text-foreground sub-heading text-center mb-2'>{item.quantity || 'null'}</p>
+
+                                            <div>
+                                                <div className='flex justify-center items-center border rounded-2xl'>
+                                                    <button
+                                                        onClick={() => updateCartItems(item.book._id, item.quantity - 1)}
+                                                        className='p-1 hover:text-mauve'><Minus size={14} /></button>
                                                     <span className='px-2 text-sm font-medium'>{item.quantity}</span>
-                                                    <button className='p-1 hover:text-mauve'><Plus size={14} /></button>
+                                                    <button
+                                                        onClick={() => updateCartItems(item.book._id, item.quantity + 1)}
+                                                        className='p-1 hover:text-mauve'><Plus size={14} /></button>
                                                 </div>
-                                                <span className='font-bold text-navy'>${item.price}</span>
+
+                                            </div>
+                                            <p className='font-bold text-navy text-right pl-4'>NRs. { item.book?.finalPrice ? Math.round(`${item.book.finalPrice * item.quantity}`) : '0.00' }</p>
+                                            <div className='flex items-center justify-center h-full'>
+                                                <button
+                                                    onClick={() => removeFromCart(item.book._id)}
+                                                    className='p-2 hover:bg-editorial-red/10 hover:text-editorial-red rounded-full transition-colors group'
+                                                    title="Remove item"
+                                                >
+                                                    <X size={20} className="transition-transform group-hover:scale-110" />
+                                                </button>
                                             </div>
                                         </div>
                                     </motion.div>
-                                ))
-                            ) : (
+                                    )
+                                }))
+                             : (
                                 <div className='h-full w-full flex flex-col items-center justify-center text-center space-y-4'>
                                     <div className='w-20 h-20 bg-gray-50 rounded-full flex items-center justify-center'>
                                         <ShoppingBag size={32} className='text-gray-300' />
@@ -84,15 +111,16 @@ const CartDrawer = () => {
                         </div>
 
                         {/* Footer */}
-                        {cartItems.length > 0 && (
-                            <div className='p-6 border-t border-gray-100 bg-gray-50/50'>
-                                <div className='flex justify-between mb-4'>
+                        {
+                            <div className='p-2 border-t border-gray-100 bg-gray-50/50'>
+                                <div className='flex justify-between'>
                                     <span className='text-gray-500'>SubTotal</span>
-                                    <span className='text-xl font-bold text-navy'>${total.toFixed(2)}</span>
+                                    <span>{cartItems.bookQuantity}</span>
+                                    <span className='text-xl font-bold text-navy'>Nrs {cartItems.subTotal}</span>
                                 </div>
                                 <button className='w-full bg-navy text-white py-4 rounded-2xl font-bold'>Checkout Now</button>
                             </div>
-                        )}
+                        }
                     </motion.div>
                 </div>
             )}

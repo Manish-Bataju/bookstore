@@ -2,7 +2,7 @@ import Cart from "../schema/cartSchema.js";
 
 //add to cart controller
 const addToCart = async (req, res) => {
-  const { items } = req.body;
+  const { bookId } = req.body;
   const userId = req.user._id; //taken from our auth Middleware
 
   try {
@@ -13,29 +13,24 @@ const addToCart = async (req, res) => {
       //if no cart create a new one with all the items sent
       cart = await Cart.create({
         user: userId,
-        items: items.map((item) => ({
-          book: item.bookId,
-          quantity: item.quantity || 1,
-        })),
+        items: [{book: bookId, quantity: 1 }],
       });
     } else {
       //if cart exists, loop through each item sent and update/add
-      items.forEach((newItem) => {
-        //2. check if the book is already in the cart
+      
         const existingItemIndex = cart.items.findIndex(
-          (item) => item.book.toString() === newItem.bookId,
+          (item) => item.book.toString() === bookId,
         );
 
         if (existingItemIndex > -1) {
-          cart.items[existingItemIndex].quantity += newItem.quantity || 1;
+          cart.items[existingItemIndex].quantity += 1;
         } else {
           //if its new, push it to the items array
           cart.items.push({
-            book: newItem.bookId,
-            quantity: newItem.quantity || 1,
+            book: bookId,
+            quantity: 1,
           });
         }
-      });
       await cart.save();
     }
 
@@ -71,12 +66,15 @@ const getCart = async (req, res) => {
       return acc + item.book.finalPrice * item.quantity;
     }, 0);
 
+    const totalBookQuantity = cart.items.reduce((acc, item) => acc + item.quantity, 0);
+
     //sending the data + the calculated total
     res.status(200).json({
       cartId: cart._id,
       items: cart.items,
       subTotal: Number(subTotal.toFixed(2)),
       itemCount: cart.items.length,
+      bookQuantity: totalBookQuantity,
     });
   } catch (error) {
     return res.status(500).json({ message: error.message });
@@ -115,21 +113,36 @@ const removeItemFromCart = async (req, res) => {
 
   try {
     const cart = await Cart.findOne({ user: userId });
-
     if (!cart) return res.status(404).json({ message: "Cart not found" });
 
     //filter out the book that matches the IF from the params
     const initialCartLength = cart.items.length;
-    cart.items = cart.items.filter((item) => item.book.toString() !== bookId);
+    cart.items = cart.items.filter((item) => item.book._id.toString() !== bookId);
 
     //Check if the item was removed
     if (cart.items.length === initialCartLength) {
       return res.status(404).json({ message: "Item not found in cart" });
     }
     await cart.save();
-    res
-      .status(200)
-      .json({ success: true, message: "Item removed from the cart", cart });
+
+    const updatedCart = await Cart.findById(cart._id).populate("items.book", "title finalPrice bookImage");
+    
+    const subTotal = updatedCart.items.reduce((acc, item) => {
+      return acc + (item.book?.finalPrice || 0) * item.quantity;
+    }, 0);
+
+    const totalBookQuantity = updatedCart.items.reduce((acc, item) => acc + item.quantity, 0);
+
+    // 4. Return the EXACT SAME SHAPE as getCart
+    return res.status(200).json({
+      success: true,
+      cartId: updatedCart._id,
+      items: updatedCart.items,
+      subTotal: Number(subTotal.toFixed(2)),
+      itemCount: updatedCart.items.length,
+      bookQuantity: totalBookQuantity,
+    });
+
   } catch (error) {
     return res.status(500).json({ message: error.message });
   }
@@ -138,10 +151,10 @@ const removeItemFromCart = async (req, res) => {
 // update the quantity of the Book
 const updateBookQuantity = async (req, res) => {
   const { bookId, quantity } = req.body;
-  const user = req.user._id;
+  const userId = req.user._id;
 
   try {
-    const cart = await Cart.findOne({ user: user._id }).populate("items.book");
+    const cart = await Cart.findOne({ user: userId }).populate("items.book");
 
     if (!cart) {
       return res
@@ -182,7 +195,7 @@ const updateBookQuantity = async (req, res) => {
     }
     await cart.save();
 
-    const updatedCart = await cart.populate("items.book", "title finalPrice");
+    const updatedCart = await Cart.findById(cart._id).populate("items.book");
     return res.status(200).json(updatedCart);
   } catch (error) {
     return res.status(500).json({ success: false, message: error.message });

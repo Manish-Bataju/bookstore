@@ -2,13 +2,22 @@ import useShop from "@/hooks/useShop.js";
 import { Featured_Enum, Genres_Enum, Special_Enum, Stationery_Enum } from "../../../Shared/enums.js";
 import ProductCard from "./ProductCard";
 
-const ProductGallery = ({ productType }) => {
+const ProductGallery = ({ productType, isRentPage = false}) => {
     const { books, loading } = useShop();
 
     const normalProductType = productType?.toLowerCase();
 
-    //fetch all the book that belongs to the main category
-    const currentProductTypeBooks = books.filter(book => book.category.productType === productType);
+    // 1. First, get the base pool of books
+    let baseBooks = [];
+    
+    if (isRentPage) {
+        // Only take books that are available for rent
+        baseBooks = books.filter(book => book.isForRent === true);
+        console.log("Books available for rent:", baseBooks);
+    } else {
+        // Traditional category filtering (Genres, Stationery, etc.)
+        baseBooks = books.filter(book => book.category.productType === productType);
+    }
 
 
     const getEnum = () => {
@@ -31,7 +40,8 @@ const ProductGallery = ({ productType }) => {
         <div className="w-full mx-auto px-5">
             {currentEnum.map((subCategory, index) => {
 
-                const sectionBooks = currentProductTypeBooks.filter(book => book.category.main === subCategory.label)
+                const sectionBooks = baseBooks.filter(book => book.category.main === subCategory.label)
+
                 //Don't show the category heading if there are no books
                 if (sectionBooks.length === 0) return null;
 
@@ -42,10 +52,13 @@ const ProductGallery = ({ productType }) => {
                         )}
 
                         <div>
-                            <h2 className="heading-lg pl-10 mb-4">{subCategory.label}</h2>
-                            <div className="grid justify-items-center mx-auto max-mls:grid-cols-1 max-mls:gap-2 tp:grid-cols-2 tp:gap-2  tls:grid-cols-3 tls:gap-3 lp:grid-cols-5 " >
+                            <h2 className="heading-lg pl-10 mb-4">
+                           {isRentPage ? `Rental ${subCategory.label}` : subCategory.label}
+
+                           </h2>
+                            <div className="grid justify-items-center max-mls:grid-cols-1 max-mls:gap-10 tp:grid-cols-2 tp:gap-10  tls:grid-cols-3 tls:gap-10 lp:grid-cols-3 dp:grid-cols-5 dp-gap-10 " >
                                 {sectionBooks.map(book => (
-                                    <ProductCard key={book._id} book={book} />
+                                    <ProductCard key={book._id} book={book} isRentPage={isRentPage} />
                                 ))}
                             </div>
                         </div>

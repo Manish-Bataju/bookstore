@@ -7,18 +7,18 @@ const cartRouter = express.Router();
 cartRouter.use(protect);
 
 //add item to cart
-cartRouter.post('/add', addToCart)
+cartRouter.post('/add', protect, addToCart)
 
 //get the user's cart
-cartRouter.get('/', getCart)
+cartRouter.get('/', protect, getCart)
 
 //remove one specific book from the cart
-cartRouter.delete('/remove/:bookId', removeItemFromCart)
+cartRouter.delete('/remove/:bookId', protect, removeItemFromCart)
 
 //clear the whole cart
-cartRouter.delete('/clear', deleteCart)
+cartRouter.delete('/clear', protect, deleteCart)
 
 //update the cartItem
-cartRouter.patch('/update-quantity', updateBookQuantity)
+cartRouter.patch('/update-quantity', protect, updateBookQuantity)
 
 export default cartRouter;
