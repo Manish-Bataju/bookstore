@@ -1,12 +1,13 @@
-import ProductEditForm from "@/Forms/ProductEditForm.jsx";
+
 import useShop from "@/hooks/useShop.js";
 import { Star } from "lucide-react";
+import { X } from "lucide-react";
 
-const ProductCard = ({ book, isRentPage  }) => {
+const ProductCard = ({ book, isRentPage }) => {
 
     console
 
-    const { user, addToCart, setBookEditingForm } = useShop();
+    const { user, addToCart, setBookEditingForm, deleteBook } = useShop();
 
     const hasDiscount = book.discountType !== "None" && book.discountType === 0;
 
@@ -14,7 +15,7 @@ const ProductCard = ({ book, isRentPage  }) => {
         addToCart(book._id);
     }
 
-   
+
 
     return (
 
@@ -95,10 +96,21 @@ const ProductCard = ({ book, isRentPage  }) => {
 
                     {user?.role === "admin" ? (
                         //admin sees the Edit Button 
-                        <button
-                            type="button"
-                            onClick={() => setBookEditingForm(book._id)}
-                            className="btn-primary -mt-px">Edit</button>) : (
+                        <div>
+                            <button
+                            onClick={() =>  deleteBook(book._id)} // This is your close function!
+                                className="absolute top-5 right-5 w-10 h-10 flex items-center justify-center rounded-full text-gray-400 transition-all duration-200 hover:text-white hover:bg-red-500 shadow-sm"
+                                type="button"
+                            >
+                                <X size={20} />
+                            </button>
+
+                            <button
+                                type="button"
+                                onClick={() => setBookEditingForm(book._id)}
+                                className="btn-primary -mt-px">Edit</button>
+                        </div>
+                    ) : (
                         //user or customer sees the add to cart button 
                         <button type="button"
                             onClick={handleAddToCart}

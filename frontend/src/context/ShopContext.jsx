@@ -1,6 +1,7 @@
 import { createContext, useState, useEffect, useRef, useCallback } from "react";
 import axios from "axios";
 import { toast } from "sonner";
+import { set } from "react-hook-form";
 
 export const InternalShopContext = createContext();
 
@@ -241,6 +242,24 @@ const ShopProvider = ({ children }) => {
     
     }
 
+    //delete book function for admin
+    const deleteBook = async (bookId) => {
+        if(!bookId) return;
+        try {
+            const response = await axios.delete(`${backendUrl}/api/book/delete/${bookId}`, {
+                headers: { Authorization: `Bearer ${token}` }
+            });
+
+            if(response.data.success){
+
+            setBooks(prevBooks => prevBooks.filter(book => book._id !== bookId));
+            toast.success("Book deleted successfully");
+        }
+
+        } catch (error) {
+            console.error("Error deleting book:", error);
+        }}
+
     const value = {
         isProfileDrawerOpen, setIsProfileDrawerOpen,
         isCartOpen, setIsCartOpen,
@@ -254,7 +273,7 @@ const ShopProvider = ({ children }) => {
         token, setToken, login, logOut,
         setActiveAdminForm, activeAdminForm,
         addToCart, updateCartItems, removeFromCart,
-        bookEditingForm, setBookEditingForm
+        bookEditingForm, setBookEditingForm, deleteBook
     }
     return (
         <InternalShopContext.Provider value={value}>
