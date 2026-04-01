@@ -6,13 +6,6 @@ const Home = () => {
   return (
     <div>
         <Hero/>
-        <BestSeller/>
-
-
-
-
-
-
     </div>
   )
 }
