@@ -37,7 +37,7 @@ const ProductGallery = ({ productType, isRentPage = false}) => {
 
     // return the actual gallery
     return (
-        <div className="w-full mx-auto px-5">
+        <div className="w-full mx-auto px-5 mt-5">
             {currentEnum.map((subCategory, index) => {
 
                 const sectionBooks = baseBooks.filter(book => book.category.main === subCategory.label)
@@ -46,7 +46,7 @@ const ProductGallery = ({ productType, isRentPage = false}) => {
                 if (sectionBooks.length === 0) return null;
 
                 return (
-                    <div className="pb-10" key={subCategory.label} >
+                    <div className="pb-5" key={subCategory.label} >
                         {index > 0 && (
                             <hr className="h-3 w-full bg-foreground-500 border-0 shadow-[0_4px_6px_-1px_rgba(0,0,0,0.1)] mb-5 mt-1" />
                         )}
@@ -56,7 +56,7 @@ const ProductGallery = ({ productType, isRentPage = false}) => {
                            {isRentPage ? `Rental ${subCategory.label}` : subCategory.label}
 
                            </h2>
-                            <div className="grid justify-items-center max-mls:grid-cols-1 max-mls:gap-10 tp:grid-cols-2 tp:gap-10  tls:grid-cols-3 tls:gap-10 lp:grid-cols-3 dp:grid-cols-5 dp-gap-10 " >
+                            <div className="grid justify-items-center max-mls:grid-cols-1 max-mls:gap-3 tp:grid-cols-2 tp:gap-3  tls:grid-cols-3 tls:gap-2 lp:grid-cols-3 dp:grid-cols-5 dp:gap-2 " >
                                 {sectionBooks.map(book => (
                                     <ProductCard key={book._id} book={book} isRentPage={isRentPage} />
                                 ))}

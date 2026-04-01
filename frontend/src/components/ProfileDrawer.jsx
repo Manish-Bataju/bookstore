@@ -120,22 +120,7 @@ const ProfileDrawer = () => {
                                                 className="btn-editorial ink-forest">
                                                     Add a Book
                                                 </button>
-                                                <button
-                                                onClick={() => {
-                                                    setActiveAdminForm('Edit');
-                                                    setIsProfileDrawerOpen(false);
-                                                  }}
-                                                className="btn-editorial ink-forest">
-                                                    Edit a Book
-                                                </button>
-                                                <button
-                                                onClick={() => {
-                                                    setActiveAdminForm('List');
-                                                    setIsProfileDrawerOpen(false);
-                                                  }}
-                                                className="btn-editorial ink-forest">
-                                                    View all books
-                                                </button>
+
                                                 </div>
                                             )}
                                         </nav>

@@ -36,6 +36,11 @@ bookRouter.put('/update/:id', protect, admin, upload.array('bookImage', 5),
 (req, _, next) =>{
     if(req.files && req.files.length >0){
         req.body.bookImage = req.files.map(file => file.path);
+
+        req.body.bookImage = {
+            coverImage: filePaths[0],
+            gallery: filePaths.slice(1)
+        };
     }
     next();
 },

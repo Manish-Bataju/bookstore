@@ -76,13 +76,6 @@ const updateBook = async (req, res) => {
 
     if (!book) return res.status(404).json({ message: "Book not found" });
 
-    // security verification whoever owns the book can edit it :)
-    if (book.author.toString() !== req.user.id) {
-      return res
-        .status(403)
-        .json({ message: "You are not authorized to edit it" });
-    }
-
     //image uploads
     if (req.files && req.files.length > 0) {
       const newImageUrls = req.files.map((file) => file.path);
@@ -91,6 +84,10 @@ const updateBook = async (req, res) => {
         coverImage: newImageUrls[0] || book.bookImage.coverImage,
         gallery: [...(book.bookImage.gallery || []), ...newImageUrls.slice(1)],
       };
+    }
+
+    if (req.body.category) {
+       req.body.category = { ...book.category, ...req.body.category };
     }
 
     //update book fields
@@ -108,6 +105,7 @@ const updateBook = async (req, res) => {
 
     res.status(200).json({ success: true, data: updatedBook });
   } catch (error) {
+    console.error("Update Controller Error:", error);
     return res.status(400).json({ message: error.message });
   }
 };

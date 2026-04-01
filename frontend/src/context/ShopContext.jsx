@@ -23,7 +23,7 @@ const ShopProvider = ({ children }) => {
 
     //get books data
     const [books, setBooks] = useState([]);
-    const [editBook, setEditBook] = useState(null);
+    const [bookEditingForm, setBookEditingForm] = useState(null);
     const [loading, setLoading] = useState(true);
 
     const [token, setToken] = useState(localStorage.getItem('token') || '');
@@ -241,12 +241,6 @@ const ShopProvider = ({ children }) => {
     
     }
 
-    //edit form function
-    const bookEditingForm = (book) => {
-        setEditBook(book);
-        setActiveAdminForm("edit");
-    }
-
     const value = {
         isProfileDrawerOpen, setIsProfileDrawerOpen,
         isCartOpen, setIsCartOpen,
@@ -260,7 +254,7 @@ const ShopProvider = ({ children }) => {
         token, setToken, login, logOut,
         setActiveAdminForm, activeAdminForm,
         addToCart, updateCartItems, removeFromCart,
-        bookEditingForm
+        bookEditingForm, setBookEditingForm
     }
     return (
         <InternalShopContext.Provider value={value}>

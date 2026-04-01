@@ -3,7 +3,7 @@ import React from 'react'
 
 const Stationery = () => {
   return (
-    <ProductGallery productType="Stationery"/>
+    <ProductGallery productType= "Genres"/>
   )
 }
 

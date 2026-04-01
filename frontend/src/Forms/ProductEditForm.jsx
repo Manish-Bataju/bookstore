@@ -7,21 +7,20 @@ import axios from "axios";
 
 
 // 2. MAIN FORM COMPONENT
-const ProductEditForm = ({ id }) => {
+const ProductEditForm = ({ bookId, onSuccess }) => {
   //getting Id from the url
-  const { books, backendUrl, setActiveAdminForm} = useShop();
+  const { books, backendUrl, setActiveAdminForm, setBookEditingForm, token } = useShop();
 
-  const selectedBook = books.find(b => b._id === id);
-  console.log(selectedBook);
+  const selectedBook = books.find(b => b._id === bookId);
 
-  const { register, control, handleSubmit, setValue, formState: { errors } } = useForm({
+  const { register, control, handleSubmit, setValue, reset, formState: { errors } } = useForm({
     mode: "onChange",
     reValidateMode: "onChange",
     defaultValues: {
       title: selectedBook?.title || '',
       description: selectedBook?.description || '',
       author: selectedBook?.author || '',
-      stockHistory:[{
+      stockHistory: [{
         unitCost: selectedBook?.price || 0
       }],
       bookImage: {
@@ -38,35 +37,65 @@ const ProductEditForm = ({ id }) => {
 
   const isForRent = useWatch({ control, name: "isForRent" });
 
-  // const discountType = useWatch({ control, name: "discount.discountType" });
-  const history = useWatch({ control, name: "stockHistory" });
-  const firstUnitCost = history?.[0]?.unitCost;
-
   useEffect(() => {
-    const previousPrice = selectedBook?.stockHistory?.[0]?.unitCost?.price;
+    const fetchBookData = async () => {
+      try {
+        const responseData = await axios.get(`${backendUrl}/api/book/${bookId}`);
+        const bookData = responseData.data.data;
 
-    if(previousPrice !== undefined){
-      setValue("stockHistory.0.unitCost", previousPrice);
+        console.log("Fetched book data:", bookData);
+
+        reset(bookData);
+
+        const previousPrice = selectedBook?.stockHistory?.[0]?.unitCost?.price;
+
+        if (previousPrice !== undefined) {
+          setValue("stockHistory.0.unitCost", previousPrice);
+        }
+      } catch (error) {
+        console.error("Failed to fetch book data:", error);
+      }
     }
-    }, [selectedBook, setValue]);
+
+    if (bookId) fetchBookData();
+
+  }, [selectedBook, setValue, reset, backendUrl, bookId]);
 
 
-  const onSubmit = (data) => {
+  const onSubmit = async (data) => {
 
     const formData = new FormData();
 
     Object.keys(data).forEach(key => {
-      if(typeof data[key] !== 'object'){
+      if (typeof data[key] !== 'object') {
         formData.append(key, data[key]);
       }
     });
 
-    if(data.bookImage?.coverImage instanceof File){
+    if (data.bookImage?.coverImage instanceof File) {
       formData.append("coverImage", data.bookImage.coverImage);
     }
 
-    axios.post(`${backendUrl}/api/book/updateBook`, formData);
-    console.log("Form Data:", formData);
+    try {
+      const response = await axios.put(`${backendUrl}/api/book/update/${bookId}`, formData,
+        { headers: { 'Content-Type': 'multipart/form-data', Authorization: `Bearer ${token}` } });
+
+      console.log("Response data", response.data)
+
+      if (response.status === 200) {
+        alert("Book updated successfully!");
+        setActiveAdminForm(null);
+
+        if (onSuccess) {
+          onSuccess(response.data.data); // Pass the updated book data
+        }
+      }
+
+
+    } catch (error) {
+      console.error("Failed to update book data:", error);
+    }
+
   };
 
   return (
@@ -75,14 +104,17 @@ const ProductEditForm = ({ id }) => {
         <h1 className="text-2xl font-bold">Edit a Product</h1>
 
         <button
-          onClick={() => setActiveAdminForm(null)} // This is your close function!
+          onClick={() => {
+            setActiveAdminForm(null);
+            setBookEditingForm(null)
+          }} // This is your close function!
           className="top-5 right-5 w-10 h-10 flex items-center justify-center rounded-full text-gray-400 transition-all duration-200 hover:text-white hover:bg-red-500 shadow-sm"
           type="button"
         >
           <X size={20} />
         </button>
       </div>
-      
+
       <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-2">
 
         <div className="flex flex-col gap-5" >
@@ -206,7 +238,8 @@ const ProductEditForm = ({ id }) => {
                   type="number"
                   readOnly //prevents user from typing the price.
                   {...register("stockHistory.0.unitCost", {
-                    valueAsNumber: true})}
+                    valueAsNumber: true
+                  })}
                   className="border focus:ring-1 focus:ring-[#0a2463] p-1 rounded"
                   onWheel={(e) => e.target.blur()}
                 />
@@ -233,11 +266,11 @@ const ProductEditForm = ({ id }) => {
               {/* Discount Amount */}
               <div className="flex flex-col grow gap-1">
 
-                  {/* label Section */}
+                {/* label Section */}
                 <div className="flex justify-between items-center">
-                    <label htmlFor="discountAmount" className="label-editorial">Discount Amount</label>
-                    
-                     {/* The Trigger: Just a label for the eyes, no click action */}
+                  <label htmlFor="discountAmount" className="label-editorial">Discount Amount</label>
+
+                  {/* The Trigger: Just a label for the eyes, no click action */}
                   <div className="group relative flex-none w-auto">
 
                     <span className="label-editorial-hover cursor-pointer"> Prev. Dis-Amount </span>
@@ -255,7 +288,7 @@ const ProductEditForm = ({ id }) => {
                     </div>
                   </div>
                 </div>
-                
+
                 <input
                   id="discountAmount"
                   type="number"
@@ -288,27 +321,27 @@ const ProductEditForm = ({ id }) => {
                 {/* Rental Price */}
                 <div className="relative mb-4 flex grow items-center gap-5">
                   <div>
-                      <label className="body-heading font-bold text-gray-700">RENTAL (Rs.)</label>
+                    <label className="body-heading font-bold text-gray-700">RENTAL (Rs.)</label>
 
-                         {/* The Trigger: Just a label for the eyes, no click action */}
-                  <div className="group relative flex-none w-auto">
+                    {/* The Trigger: Just a label for the eyes, no click action */}
+                    <div className="group relative flex-none w-auto">
 
-                    <span className="label-editorial-hover cursor-pointer"> Prv. Rental</span>
-                    {/* THE REFERENCE TOOLTIP (Shows on Hover) */}
-                    <div className="absolute right-0 w-75 mb-3 p-2 bg-gray-700 text-white text-[14px] rounded-md shadow-2xl opacity-0 group-hover:opacity-100 transition-all duration-300 pointer-events-none z-50 border border-white/10">
-                      <p className="text-secondary font-semibold uppercase tracking-normal mb-1 border-b-2 border-white/20 pb-1">
-                        Previous Price :
-                      </p>
-                      {/* This displays the data sitting in your 'selectedBook' state */}
-                      <p className="leading-tight text-gray-300 italic">
-                        "{selectedBook?.rentalPrice || "No previous rental price Found"}"
-                      </p>
+                      <span className="label-editorial-hover cursor-pointer"> Prv. Rental</span>
+                      {/* THE REFERENCE TOOLTIP (Shows on Hover) */}
+                      <div className="absolute right-0 w-75 mb-3 p-2 bg-gray-700 text-white text-[14px] rounded-md shadow-2xl opacity-0 group-hover:opacity-100 transition-all duration-300 pointer-events-none z-50 border border-white/10">
+                        <p className="text-secondary font-semibold uppercase tracking-normal mb-1 border-b-2 border-white/20 pb-1">
+                          Previous Price :
+                        </p>
+                        {/* This displays the data sitting in your 'selectedBook' state */}
+                        <p className="leading-tight text-gray-300 italic">
+                          "{selectedBook?.rentalPrice || "No previous rental price Found"}"
+                        </p>
 
 
+                      </div>
                     </div>
                   </div>
-                  </div>
-                  
+
                   <input
                     type="number"
                     {...register("rentalPrice", {

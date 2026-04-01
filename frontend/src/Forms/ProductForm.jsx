@@ -1,7 +1,7 @@
 import { useForm, useWatch } from "react-hook-form";
 import { Category_Config } from "@/data/CategoryConfig.js";
 import { useEffect } from "react";
-import CategorySelector from "@/Components/CategorySelector.jsx";
+import CategorySelector from "@/components/CategorySelector.jsx";
 import TagSelector from "@/components/TagSelector.jsx";
 import ImageUploader from "@/components/ImageUploader.jsx";
 import { Rental_Tags } from "../../../Shared/enums.js";

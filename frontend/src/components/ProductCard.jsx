@@ -1,15 +1,20 @@
+import ProductEditForm from "@/Forms/ProductEditForm.jsx";
 import useShop from "@/hooks/useShop.js";
 import { Star } from "lucide-react";
 
 const ProductCard = ({ book, isRentPage  }) => {
 
-    const { user, addToCart, bookEditingForm } = useShop();
+    console
+
+    const { user, addToCart, setBookEditingForm } = useShop();
 
     const hasDiscount = book.discountType !== "None" && book.discountType === 0;
 
     const handleAddToCart = () => {
         addToCart(book._id);
     }
+
+   
 
     return (
 
@@ -92,7 +97,7 @@ const ProductCard = ({ book, isRentPage  }) => {
                         //admin sees the Edit Button 
                         <button
                             type="button"
-                            onClick={() => bookEditingForm(book._id)}
+                            onClick={() => setBookEditingForm(book._id)}
                             className="btn-primary -mt-px">Edit</button>) : (
                         //user or customer sees the add to cart button 
                         <button type="button"

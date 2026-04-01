@@ -71,15 +71,6 @@ const bookSchema = new mongoose.Schema(
     ],
     isForRent: { type: Boolean, default: false },
     rentalPrice: { type: Number, default: 0 },
-    rentalStatus: {
-      type: String,
-      enum: [
-        "Available for Rent",
-        "Currently Rented",
-        "Not available for Rent",
-      ], // Add this!
-      default: "Not available for Rent",
-    },
 
     averageRating: { type: Number, default: 0 },
     totalReviews: { type: Number, default: 0 },
