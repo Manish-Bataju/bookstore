@@ -118,7 +118,7 @@ const CartDrawer = () => {
                                     <span>{cartItems.bookQuantity}</span>
                                     <span className='text-xl font-bold text-navy'>Nrs {cartItems.subTotal}</span>
                                 </div>
-                                <button className='w-full bg-navy text-white py-4 rounded-2xl font-bold'>Checkout Now</button>
+                                <button className='w-full bg-foreground text-white py-4 rounded-2xl font-bold'>Checkout Now</button>
                             </div>
                         }
                     </motion.div>
